@@ -14,7 +14,7 @@ class VirtualNetworkTapCommandsLoader(AzCommandsLoader):
     def __init__(self, cli_ctx=None):
         from azure.cli.core.commands import CliCommandType
         from .profiles import CUSTOM_VNET_TAP
-        register_resource_type('latest', CUSTOM_VNET_TAP, '2018-08-01')
+        register_resource_type('latest', CUSTOM_VNET_TAP, '2022-11-01')
 
         super(VirtualNetworkTapCommandsLoader, self).__init__(
             cli_ctx=cli_ctx,
@@ -24,6 +24,17 @@ class VirtualNetworkTapCommandsLoader(AzCommandsLoader):
 
     def load_command_table(self, args):
         from .commands import load_command_table
+        from azure.cli.core.aaz import load_aaz_command_table
+        try:
+            from . import aaz
+        except ImportError:
+            aaz = None
+        if aaz:
+            load_aaz_command_table(
+                loader=self,
+                aaz_pkg_name=aaz.__name__,
+                args=args
+            )
         load_command_table(self, args)
         return self.command_table
 
